@@ -29,7 +29,7 @@ void loop() {
     const auto measurement = sonar.readDistanceCm();
     Serial.printf("Read value: %.2f\n", measurement);
     if (measurement != US100::ERROR_VALUE) {
-        LCD.clear();
+        LCD.fillScreen(TFT_BLACK);
         LCD.setCursor(20, 30);
         LCD.printf("Distance: %f cm", measurement);
     }
