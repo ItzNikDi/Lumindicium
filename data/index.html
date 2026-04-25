@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ESP32 SSE</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="site_deps/tailwind.js"></script>
+    <link rel="stylesheet" href="site_deps/style.css">
+</head>
+
+<body>
+    <main class="p-10 flex justify-center ">
+        <div class="flex flex-col w-110 text-lg">
+            <h1 class="text-3xl mb-5 text-center">Welcome to ESP32 sensor controller!</h1>
+            <p class="mb-5">If an object is within the desired distance of the <a class="text-yellow-500">yellow</a>
+                range,
+                a yellow light will light up and a sound with desired volume will play.
+                If the object is close enough to be withing the <a class="text-red-500">red</a> range, the same will
+                happen but with a red light.</p>
+            <div class="bg-green-500 mb-5 rounded px-2 text-black">
+                <h2 class="">Distance to object: <span id="distance">--</span> cm</h2>
+            </div>
+            <div>
+                <form class="max-w-sm mx-auto mb-5">
+                    <h3 class="mb-2">
+                        Adjust minimum distance for <span class="text-yellow-500">yellow</span> range (in cm):
+                    </h3>
+                    <input type="number" id="yellow-input" min="2" max="200" step="1"
+                        class="block rounded w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+                        placeholder="current cm" required />
+                </form>
+
+                <form class="max-w-sm mx-auto mb-5">
+                    <h3 class="mb-2">
+                        Adjust minimum distance for <span class="text-red-500">red</span> range (in cm):
+                    </h3>
+                    <input type="number" id="red-input" min="2" max="200" step="1"
+                        class="block rounded w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+                        placeholder="current cm" required />
+                </form>
+            </div>
+            <div>
+                <h3 class="mb-5">Adjust volume for <a class="text-yellow-500">yellow</a> range:</h3>
+                <div class="relative mb-11">
+                    <label for="labels-range-input" class="sr-only">Labels range</label>
+                    <input id="labels-range-input" type="range" value="0" min="0" max="100"
+                        class="w-full h-2 bg-yellow-500 rounded-full appearance-none cursor-pointer">
+                    <span class="text-sm text-body absolute start-0 -bottom-6">0%</span>
+                    <span
+                        class="text-sm text-body absolute start-1/4 -translate-x-1/2 rtl:translate-x-1/2 -bottom-6">25%</span>
+                    <span
+                        class="text-sm text-body absolute start-1/2 -translate-x-1/2 rtl:translate-x-1/2 -bottom-6">50%</span>
+                    <span
+                        class="text-sm text-body absolute start-3/4 -translate-x-1/2 rtl:translate-x-1/2 -bottom-6">75%</span>
+                    <span class="text-sm text-body absolute end-0 -bottom-6">100%</span>
+                </div>
+                <h3 class="mb-5">Adjust volume for <a class="text-red-500">red</a> range:</h3>
+                <div class="relative mb-11">
+                    <label for="labels-range-input" class="sr-only">Labels range</label>
+                    <input id="labels-range-input" type="range" value="0" min="0" max="100"
+                        class="w-full h-2 bg-red-500 rounded-full appearance-none cursor-pointer">
+                    <span class="text-sm text-body absolute start-0 -bottom-6">0%</span>
+                    <span
+                        class="text-sm text-body absolute start-1/4 -translate-x-1/2 rtl:translate-x-1/2 -bottom-6">25%</span>
+                    <span
+                        class="text-sm text-body absolute start-1/2 -translate-x-1/2 rtl:translate-x-1/2 -bottom-6">50%</span>
+                    <span
+                        class="text-sm text-body absolute start-3/4 -translate-x-1/2 rtl:translate-x-1/2 -bottom-6">75%</span>
+                    <span class="text-sm text-body absolute end-0 -bottom-6">100%</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    <script src="app.js"></script>
+</body>
+
+</html>
