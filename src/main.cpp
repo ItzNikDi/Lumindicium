@@ -2,14 +2,19 @@
 #include <FS.h>
 #include <LittleFS.h>
 #include "display.h"
+#include "esp32-hal-adc.h"
+#include "esp32-hal-gpio.h"
+#include "esp32-hal-ledc.h"
 #include <US100.h>
 #include <WiFi.h>
 #include <esp_http_server.h>
+#define POT_PIN 32
+#define LED_PIN 16
 
 US100 sonar(Serial2);
-
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_PASSWORD";
+//TFT_eSPI tft;
+const char* ssid = "ESP32";
+const char* password = "muika1234";
 
 httpd_handle_t server = NULL;
 
@@ -111,6 +116,8 @@ void startServer() {
 }
 
 void setup() {
+    tft.begin();
+    
 #if defined(ARDUINO_M5STACK_Core2)
     auto config = m5::M5Unified::config();
     config.serial_baudrate = 115200;
@@ -120,7 +127,9 @@ void setup() {
 #endif
 
     Serial2.begin(9600, SERIAL_8N1, 13, 14);
-
+    ledcSetup(0, 5000, 8);
+    ledcAttachPin(LED_PIN, 0);
+    pinMode(POT_PIN,INPUT);
     initDisplay();
 
     if (sonar.begin()) {
@@ -129,14 +138,10 @@ void setup() {
     }
 
     // WiFi
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
+    WiFi.softAP(ssid, password);
 
     Serial.println("\nConnected!");
-    Serial.println(WiFi.localIP());
+    Serial.println();
 
     // filesystem
     LittleFS.begin(true);
@@ -157,5 +162,9 @@ void setup() {
 }
 
 void loop() {
-    // empty: everything runs in tasks
+    auto raw = analogRead(POT_PIN);
+    LCD.printf("Brightness: %d", raw);
+    auto brightness = map(raw, 0, 4095, 0, 255);
+    ledcWrite(0, brightness);
+    delay(25);
 }
