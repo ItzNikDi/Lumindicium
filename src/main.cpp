@@ -1,38 +1,59 @@
 #include <Arduino.h>
-#include "display.h"
+#include <M5Unified.h>
+#include <ESPAsyncWebServer.h>
+#include <LittleFS.h>
+#include <WiFi.h>
 
-#include <US100.h>
+#include "audio.h"
+#include "globals.h"
+#include "leds.h"
+#include "sensor.h"
+#include "ui.h"
+#include "web_handlers.h"
 
-US100 sonar(Serial2);
+static constexpr uint32_t POT_INTERVAL_MS = 50;
+static constexpr uint32_t SENSOR_INTERVAL_MS = 200;
+static constexpr uint32_t DISPLAY_INTERVAL_MS = 500;
+
+static uint32_t lastPotMs = 0;
+static uint32_t lastSensorMs = 0;
+static uint32_t lastDisplayMs = 0;
 
 void setup() {
-#if defined(ARDUINO_M5STACK_Core2)
-    auto config = m5::M5Unified::config();
-    config.serial_baudrate = 115200;
-    M5.begin(config);
-#elif defined(ARDUINO_ESP32_DEV)
-    Serial.begin(115200);
-#endif
-    //TODO abstract this logic away :)
+    auto m5config = m5::M5Unified::config();
+    m5config.serial_baudrate = 115200;
+    M5.begin(m5config);
+    M5.Log.setLogLevel(m5::log_target_serial, ESP_LOG_DEBUG);
     Serial2.begin(9600, SERIAL_8N1, 13, 14);
-    initDisplay();
+    M5.Speaker.begin();
 
-    if (sonar.begin()) {
-        Serial.printf("Sonar initialized!\n");
-        LCD.printf("Sonar initialized!\n");
-    }
+    ledsBegin();
+    LittleFS.begin();
+    loadWav("/sounds/beep1.wav", gWavYellow);
+    loadWav("/sounds/beep2.wav", gWavRed);
+
+    WiFi.softAP(AP_SSID, AP_PASS);
+    setupRoutes();
+    server.begin();
+
+    M5.Display.begin();
+    M5.Display.setRotation(1);
 }
 
 void loop() {
-    delay(200);
+    M5.update();
 
-    const auto measurement = sonar.readDistanceCm();
-    Serial.printf("Read value: %.2f\n", measurement);
-    if (measurement != US100::ERROR_VALUE) {
-        LCD.clear();
-        LCD.setCursor(20, 30);
-        LCD.printf("Distance: %f cm", measurement);
+    const auto now = millis();
+    if (now - lastPotMs >= POT_INTERVAL_MS) {
+        lastPotMs = now;
+        tickPotentiometer();
     }
-
-    delay(300);
+    if (now - lastSensorMs >= SENSOR_INTERVAL_MS) {
+        lastSensorMs = now;
+        tickSensor();
+    }
+    if (now - lastDisplayMs >= DISPLAY_INTERVAL_MS) {
+        lastDisplayMs = now;
+        tickDisplay();
+    }
 }
